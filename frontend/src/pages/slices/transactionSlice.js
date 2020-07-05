@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API = 'http://localhost:8080/api/v1/machine';
+const API = 'http://localhost:8080/api/v1/machine/transaction';
 
 const TransactionSlice = createSlice({
   name: 'transaction',
@@ -20,9 +20,15 @@ const TransactionSlice = createSlice({
       state.error = action.payload;
     },
     setRequestSuccess: (state, action) => {
-      state.error = null;
-      state.status = 'success';
-      state.result = action.payload;
+      const result = action.payload;
+      if (result.transactionHistory.status === 'FAIL') {
+        state.error = result.transactionHistory.reason;
+        state.status = 'error';
+      } else {
+        state.error = null;
+        state.status = 'success';
+      }
+      state.result = result;
     },
   },
 });
@@ -33,36 +39,25 @@ export const {
   setRequestSuccess,
 } = TransactionSlice.actions;
 
-export const transactionSelector = (state) => state.transaction;
+export const transactionSliceSelector = (state) => state.transaction;
 
 export default TransactionSlice.reducer;
 
-export const addCredit = (machineId, amount) => (dispatch) => {
-  const url = API + '/credit/add?machine=' + machineId + '&amount=' + amount;
-  dispatch(setRequesting());
-  axios
-    .get(url)
-    .then((res) => {
-      dispatch(setRequestSuccess(res.data));
-    })
-    .catch((error) => {
-      let msg = 'Something went wrong.';
-      if (error.response) {
-        msg = error.response.data.message;
-      }
-      dispatch(setRequestError(msg));
-    });
-};
+export const buyProduct = (machineId, productSlotId, payment) => (dispatch) => {
+  const url = API + '/buy?machine=' + machineId + '&slot=' + productSlotId;
+  dispatch(setRequesting);
+  console.log(url);
 
-export const withdrawCredits = (machineId) => (dispatch) => {
-  const url = API + '/credit/withdraw?machine=' + machineId;
-  dispatch(setRequesting());
   axios
-    .get(url)
+    .post(url, payment)
     .then((res) => {
+      console.log(res.data);
+
       dispatch(setRequestSuccess(res.data));
     })
     .catch((error) => {
+      console.log(error);
+
       let msg = 'Something went wrong.';
       if (error.response) {
         msg = error.response.data.message;

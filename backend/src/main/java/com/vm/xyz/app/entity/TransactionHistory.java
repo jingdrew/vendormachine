@@ -29,4 +29,6 @@ public class TransactionHistory extends BaseEntity {
     private String productName;
     private BigDecimal productCost;
     private BigDecimal productSellPrice;
+    private String status;
+    private String reason;
 }

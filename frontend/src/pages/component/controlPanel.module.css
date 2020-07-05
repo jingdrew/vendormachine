@@ -1,0 +1,53 @@
+.display_screen {
+  background-color: #204829;
+  margin-left: 25px;
+  margin-right: 25px;
+  height: 170px;
+}
+
+.display_credits {
+  padding-top: 25px;
+  color: #22b430;
+  font-size: 30px;
+}
+
+.display_message {
+  color: #22b480;
+  font-size: 20px;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.payment_container {
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.small_button {
+  margin: 10px !important;
+  height: 100px;
+  width: 100px;
+  color: white !important;
+  background: green !important;
+}
+
+.card_button {
+  height: 50px;
+  width: 100%;
+  color: white !important;
+  background: green !important;
+}
+
+.withdraw_button {
+  height: 50px;
+  width: 100%;
+  color: white !important;
+  background: blue !important;
+}
+
+.admin_button {
+  height: 50px;
+  width: 100%;
+  color: white !important;
+  background: red !important;
+}

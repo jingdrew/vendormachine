@@ -3,6 +3,8 @@ package com.vm.xyz.app.service;
 import com.vm.xyz.app.entity.Machine;
 import com.vm.xyz.app.entity.MachineMoneySlot;
 import com.vm.xyz.app.entity.MachineProductSlot;
+import com.vm.xyz.app.model.Payment;
+import com.vm.xyz.app.model.PaymentResult;
 
 import java.util.List;
 
@@ -25,4 +27,7 @@ public interface MachineService {
     List<MachineMoneySlot> getMachineMoneySlots(Long machineId);
 
     List<MachineMoneySlot> saveMachineMoneySlots(List<MachineMoneySlot> moneySlots);
+
+    PaymentResult buyProduct(Long machineId, Long productSlotId, Payment payment);
+
 }

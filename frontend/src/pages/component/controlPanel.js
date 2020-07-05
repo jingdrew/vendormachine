@@ -1,77 +1,138 @@
 import React, { useState, useEffect } from 'react';
-import { Button, makeStyles } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import {
-  addCredit,
-  withdrawCredits,
-  transactionSelector,
+  buyProduct,
+  setRequesting,
+  transactionSliceSelector,
 } from '../slices/transactionSlice';
-import {} from 'react-redux';
-const useStyles = makeStyles({
-  display_screen: {
-    backgroundColor: '#204829',
-    marginLeft: '25px',
-    marginRight: '25px',
-    height: '170px',
-  },
-  display_credits: {
-    paddingTop: '25px',
-    color: '#22b430',
-    fontSize: '30px',
-  },
-  display_message: {
-    color: '#22b480',
-    fontSize: '20px',
-    marginLeft: '25px',
-    marginRight: '25px',
-  },
-  payment_container: {
-    paddingLeft: '25px',
-    paddingRight: '25px',
-  },
-  small_button: {
-    margin: '10px !important',
-    height: '100px',
-    width: '100px',
-    color: 'white !important',
-    background: 'green !important',
-  },
-  card_button: {
-    height: '50px',
-    width: '100%',
-    color: 'white !important',
-    background: 'green !important',
-  },
-  withdraw_button: {
-    height: '50px',
-    width: '100%',
-    color: 'white !important',
-    background: 'blue !important',
-  },
-  admin_button: {
-    height: '50px',
-    width: '100%',
-    color: 'white !important',
-    background: 'red !important',
-  },
-});
+import { useSelector, useDispatch } from 'react-redux';
+import styles from './controlPanel.module.css';
 
-const ControlPanel = (props) => {
+const ControlPanel = ({ data, setData }) => {
+  const dispatch = useDispatch();
+  const transactionSelector = useSelector(transactionSliceSelector);
   const [machine, setMachine] = useState(null);
-  const styles = useStyles();
-  const [credit, setCredit] = useState(0);
+  const [totalCredit, setTotalCredit] = useState(0);
   const [message, setMessage] = useState('Welcome :)');
+  const [cardInserted, setCardInserted] = useState(false);
+  const [showingMsg, setShowingMsg] = useState(false);
+  const [creditStack, setCreditStack] = useState([]);
+  const [handlingPayment, setHandlingPayment] = useState(false);
 
   useEffect(() => {
-    if (props.machine) {
-      console.log(props.machine);
+    setMachine(data.machine);
+  }, [data.machine]);
 
-      setMachine(props.machine);
+  useEffect(() => {
+    if (transactionSelector.status === 'loading') {
+      setMessage('Welcome :)');
+      setHandlingPayment(true);
+      if (cardInserted) {
+        setMessage('Processing Payment...');
+        showTempMessage('Verifying Credit/Debit Card...');
+      }
+    } else if (transactionSelector.status === 'error') {
+      setHandlingPayment(false);
+      if (cardInserted) {
+        showTempMessage('Credit/Debit Card Rejected, Payment Not Processed');
+        setCardInserted(false);
+      } else {
+        showTempMessage('Payment Not Processed, Please Try Again');
+      }
+    } else if (transactionSelector.status === 'success') {
+      setHandlingPayment(false);
+      showTempMessage('Transaction Succesful. Thank You!!!');
+      setData({
+        machine: transactionSelector.result.transactionHistory.machine,
+        selectedSlot: null,
+      });
     }
-  }, [props]);
+  }, [transactionSelector]);
 
-  const handleButtonClick = (val) => {};
-  const handleAddCredit = (val) => {
-    console.log(val);
+  useEffect(() => {
+    if (data.selectedSlot) {
+      setMessage('Please Insert Payment');
+      let credit = 0;
+      creditStack.forEach((m) => {
+        credit += m.qty * m.currency.value;
+      });
+      setTotalCredit(credit);
+      if (credit >= data.selectedSlot.product.price) {
+        setHandlingPayment(true);
+        const payment = {
+          paymentMethod: 'CASH',
+          moneyStacks: [...creditStack],
+        };
+        dispatch(buyProduct(machine.id, data.selectedSlot.id, payment));
+      }
+    }
+  }, [data.selectedSlot, creditStack]);
+
+  const showTempMessage = (newMsg) => {
+    if (!showingMsg) {
+      setShowingMsg(true);
+      const prevMessage = message;
+      setMessage(newMsg);
+      setTimeout(() => {
+        setMessage(prevMessage);
+        setShowingMsg(false);
+      }, 2000);
+    }
+  };
+
+  const handleButtonClick = (val) => {
+    if (val === 'admin') {
+    } else {
+      if (cardInserted) {
+        setCardInserted(false);
+      } else {
+        if (totalCredit > 0) {
+          creditStack.forEach((c) => {
+            console.log(c.qty + ' x ' + c.valueName);
+          });
+        }
+      }
+    }
+  };
+  const handleAddPayment = (val, name) => {
+    if (handlingPayment) return;
+    if (data.selectedSlot) {
+      if (val === 'CARD') {
+        if (totalCredit > 0) {
+          showTempMessage(
+            'Please withdraw your credit and reinsert your credit/debit card'
+          );
+        } else {
+          setCardInserted(true);
+          setHandlingPayment(true);
+          dispatch(setRequesting());
+          setTimeout(() => {
+            const payment = {
+              paymentMethod: 'CARD',
+              moneyStacks: [],
+            };
+            dispatch(buyProduct(machine.id, data.selectedSlot.id, payment));
+          }, 2000);
+        }
+      } else {
+        const index = creditStack.findIndex((c) => c.currency.value === val);
+        if (index === -1) {
+          setCreditStack([
+            ...creditStack,
+            { currency: { value: val, valueName: name }, qty: 1 },
+          ]);
+        } else {
+          let stacks = [...creditStack];
+          stacks[index] = {
+            ...stacks[index],
+            qty: stacks[index].qty + 1,
+          };
+          setCreditStack(stacks);
+        }
+      }
+    } else {
+      showTempMessage('Please select your item you want to buy first');
+    }
   };
 
   const render = () => {
@@ -80,7 +141,9 @@ const ControlPanel = (props) => {
         <div>
           <h2>{machine.model}</h2>
           <div className={styles.display_screen}>
-            <p className={styles.display_credits}>CREDITS: ${credit}</p>
+            <p className={styles.display_credits}>
+              CREDITS: ${totalCredit.toFixed(2)}
+            </p>
             <p className={styles.display_message}>{message}</p>
           </div>
           <div className={styles.payment_container}>
@@ -88,51 +151,67 @@ const ControlPanel = (props) => {
             <div>
               <Button
                 className={styles.small_button}
-                onClick={() => handleAddCredit('2')}
+                onClick={() => handleAddPayment('2', '$2 Dollars')}
               >
                 $2 BILL
               </Button>
               <Button
                 className={styles.small_button}
-                onClick={() => handleAddCredit('1')}
+                onClick={() => handleAddPayment('1', '$1 Dollar')}
               >
-                $2 BILL
+                $1 BILL
               </Button>
               <Button
                 className={styles.small_button}
-                onClick={() => handleAddCredit('0.5')}
+                onClick={() => handleAddPayment('0.5', '50 Cents')}
               >
-                $2 BILL
+                50 CENTS
               </Button>
               <Button
                 className={styles.small_button}
-                onClick={() => handleAddCredit('0.25')}
+                onClick={() => handleAddPayment('0.25', '25 Cents')}
               >
-                $2 BILL
+                25 CENTS
               </Button>
               <Button
                 className={styles.small_button}
-                onClick={() => handleAddCredit('0.10')}
+                onClick={() => handleAddPayment('0.10', '10 Cents')}
               >
-                $2 BILL
+                10 CENTS
               </Button>
               <Button
                 className={styles.small_button}
-                onClick={() => handleAddCredit('0.05')}
+                onClick={() => handleAddPayment('0.05', '5 Cents')}
               >
-                $2 BILL
+                5 CENTS
               </Button>
             </div>
+
             <hr />
             {machine.acceptedPaymentMethod === 'ALL' ? (
-              <Button className={styles.card_button}>CREDIT/DEBIT CARD</Button>
+              <Button
+                className={styles.card_button}
+                onClick={() => handleAddPayment('CARD')}
+              >
+                CREDIT/DEBIT CARD
+              </Button>
             ) : (
               <div></div>
             )}
             <hr />
-            <Button className={styles.withdraw_button}>WITHDRAW</Button>
+            <Button
+              className={styles.withdraw_button}
+              onClick={() => handleButtonClick('withdraw')}
+            >
+              WITHDRAW
+            </Button>
             <hr />
-            <Button className={styles.admin_button}>ADMIN</Button>
+            <Button
+              className={styles.admin_button}
+              onClick={() => handleButtonClick('admin')}
+            >
+              ADMIN
+            </Button>
           </div>
         </div>
       );

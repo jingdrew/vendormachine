@@ -25,9 +25,12 @@ const MachinePage = () => {
   const location = useLocation();
   const history = useHistory();
   const dispatch = useDispatch();
-  const [machine, setMachine] = useState(null);
   const selector = useSelector(machineSelector);
   const styles = useStyles();
+  const [data, setData] = useState({
+    machine: null,
+    selectedSlot: null,
+  });
 
   useEffect(() => {
     if (location.state) {
@@ -39,7 +42,10 @@ const MachinePage = () => {
 
   useEffect(() => {
     if (selector.status === 'success') {
-      setMachine(selector.machine);
+      setData({
+        machine: selector.machine,
+        selectedSlot: null,
+      });
     }
   }, [selector]);
 
@@ -48,10 +54,10 @@ const MachinePage = () => {
       <Container>
         <div className={styles.container}>
           <div className={styles.left_panel}>
-            <DisplayPanel machine={machine} />
+            <DisplayPanel data={data} setData={setData} />
           </div>
           <div className={styles.right_panel}>
-            <ControlPanel machine={machine} />
+            <ControlPanel data={data} setData={setData} />
           </div>
         </div>
       </Container>
