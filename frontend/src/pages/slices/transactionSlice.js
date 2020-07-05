@@ -3,11 +3,11 @@ import axios from 'axios';
 
 const API = 'http://localhost:8080/api/v1/machine';
 
-const HomeSlice = createSlice({
-  name: 'home',
+const TransactionSlice = createSlice({
+  name: 'transaction',
   initialState: {
     status: 'idle',
-    machines: [],
+    result: null,
     error: null,
   },
   reducers: {
@@ -22,7 +22,7 @@ const HomeSlice = createSlice({
     setRequestSuccess: (state, action) => {
       state.error = null;
       state.status = 'success';
-      state.machines = action.payload;
+      state.result = action.payload;
     },
   },
 });
@@ -31,14 +31,31 @@ export const {
   setRequesting,
   setRequestError,
   setRequestSuccess,
-} = HomeSlice.actions;
+} = TransactionSlice.actions;
 
-export const homeSelector = (state) => state.home;
+export const transactionSelector = (state) => state.transaction;
 
-export default HomeSlice.reducer;
+export default TransactionSlice.reducer;
 
-export const fetchMachines = () => (dispatch) => {
-  const url = API + '/list';
+export const addCredit = (machineId, amount) => (dispatch) => {
+  const url = API + '/credit/add?machine=' + machineId + '&amount=' + amount;
+  dispatch(setRequesting());
+  axios
+    .get(url)
+    .then((res) => {
+      dispatch(setRequestSuccess(res.data));
+    })
+    .catch((error) => {
+      let msg = 'Something went wrong.';
+      if (error.response) {
+        msg = error.response.data.message;
+      }
+      dispatch(setRequestError(msg));
+    });
+};
+
+export const withdrawCredits = (machineId) => (dispatch) => {
+  const url = API + '/credit/withdraw?machine=' + machineId;
   dispatch(setRequesting());
   axios
     .get(url)

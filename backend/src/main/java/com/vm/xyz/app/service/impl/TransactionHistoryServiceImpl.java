@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class TransactionHistoryImpl implements TransactionHistoryService {
+public class TransactionHistoryServiceImpl implements TransactionHistoryService {
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 

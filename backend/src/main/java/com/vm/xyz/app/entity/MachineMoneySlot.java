@@ -1,13 +1,15 @@
 package com.vm.xyz.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.vm.xyz.app.model.Owner;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 @Getter
@@ -24,6 +26,5 @@ public class MachineMoneySlot extends BaseEntity {
     @OneToOne
     private Currency currency;
 
-    private Owner owner;
     private int qty;
 }

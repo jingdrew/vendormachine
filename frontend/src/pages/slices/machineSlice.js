@@ -3,11 +3,11 @@ import axios from 'axios';
 
 const API = 'http://localhost:8080/api/v1/machine';
 
-const HomeSlice = createSlice({
-  name: 'home',
+const MachineSlice = createSlice({
+  name: 'machine',
   initialState: {
     status: 'idle',
-    machines: [],
+    machine: null,
     error: null,
   },
   reducers: {
@@ -22,7 +22,7 @@ const HomeSlice = createSlice({
     setRequestSuccess: (state, action) => {
       state.error = null;
       state.status = 'success';
-      state.machines = action.payload;
+      state.machine = action.payload;
     },
   },
 });
@@ -31,14 +31,14 @@ export const {
   setRequesting,
   setRequestError,
   setRequestSuccess,
-} = HomeSlice.actions;
+} = MachineSlice.actions;
 
-export const homeSelector = (state) => state.home;
+export const machineSelector = (state) => state.machine;
 
-export default HomeSlice.reducer;
+export default MachineSlice.reducer;
 
-export const fetchMachines = () => (dispatch) => {
-  const url = API + '/list';
+export const fetchMachine = (machineId) => (dispatch) => {
+  const url = API + '/' + machineId;
   dispatch(setRequesting());
   axios
     .get(url)

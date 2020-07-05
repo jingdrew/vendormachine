@@ -18,4 +18,11 @@ public class XyzExceptionHandler extends ResponseEntityExceptionHandler {
         XyzException exception = new XyzException(e.getMessage(), status, ZonedDateTime.now(ZoneId.of("Z")));
         return new ResponseEntity<>(exception, status);
     }
+
+    @ExceptionHandler(value = BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(BadRequestException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        XyzException exception = new XyzException(e.getMessage(), status, ZonedDateTime.now(ZoneId.of("Z")));
+        return new ResponseEntity<>(exception, status);
+    }
 }

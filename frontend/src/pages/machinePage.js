@@ -1,10 +1,60 @@
-import React from 'react';
-import { Container } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
+import { Container, makeStyles } from '@material-ui/core';
+import { fetchMachine, machineSelector } from './slices/machineSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useHistory } from 'react-router-dom';
+import DisplayPanel from './component/displayPanel';
+import ControlPanel from './component/controlPanel';
+
+const useStyles = makeStyles({
+  container: {
+    marginTop: '50px !important',
+    display: 'flex',
+  },
+
+  left_panel: {
+    width: '70%',
+  },
+
+  right_panel: {
+    width: '30%',
+  },
+});
 
 const MachinePage = () => {
+  const location = useLocation();
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const [machine, setMachine] = useState(null);
+  const selector = useSelector(machineSelector);
+  const styles = useStyles();
+
+  useEffect(() => {
+    if (location.state) {
+      dispatch(fetchMachine(location.state.id));
+    } else {
+      history.push('/');
+    }
+  }, [location, dispatch, history]);
+
+  useEffect(() => {
+    if (selector.status === 'success') {
+      setMachine(selector.machine);
+    }
+  }, [selector]);
+
   return (
     <div>
-      <Container>ASDASDASDASD</Container>
+      <Container>
+        <div className={styles.container}>
+          <div className={styles.left_panel}>
+            <DisplayPanel machine={machine} />
+          </div>
+          <div className={styles.right_panel}>
+            <ControlPanel machine={machine} />
+          </div>
+        </div>
+      </Container>
     </div>
   );
 };

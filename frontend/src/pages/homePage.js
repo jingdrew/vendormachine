@@ -8,7 +8,7 @@ import {
   CardContent,
   Typography,
 } from '@material-ui/core';
-import { fetchMachines, homeSlector } from './slices/homeSlice';
+import { fetchMachines, homeSelector } from './slices/homeSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -26,7 +26,7 @@ const HomePage = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
-  const selector = useSelector(homeSlector);
+  const selector = useSelector(homeSelector);
   const [machines, setMachines] = useState([]);
 
   useEffect(() => {

@@ -24,4 +24,8 @@ public class MachineProductSlot extends BaseEntity {
     private Product product;
 
     private int qty;
+
+    public void addQty(int qty) {
+        this.qty += qty;
+    }
 }

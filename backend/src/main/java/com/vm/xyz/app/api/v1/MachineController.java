@@ -3,10 +3,13 @@ package com.vm.xyz.app.api.v1;
 import com.vm.xyz.app.entity.Machine;
 import com.vm.xyz.app.entity.MachineMoneySlot;
 import com.vm.xyz.app.entity.MachineProductSlot;
+import com.vm.xyz.app.model.TransactionResult;
 import com.vm.xyz.app.service.MachineService;
+import com.vm.xyz.app.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -15,6 +18,7 @@ import java.util.List;
 public class MachineController {
 
     private final MachineService machineService;
+    private final TransactionService transactionService;
 
     @GetMapping("/{id}")
     public Machine getMachine(@PathVariable("id") Long machineId) {
@@ -44,6 +48,16 @@ public class MachineController {
     @PostMapping("/mlot")
     public MachineMoneySlot saveMachineMoneySlot(@RequestBody MachineMoneySlot moneySlot) {
         return machineService.saveMachineMoneySlot(moneySlot);
+    }
+
+    @PostMapping("/credit/add")
+    public TransactionResult addCredit(@RequestParam("machine") Long machineId, @RequestParam("amount")BigDecimal amount) {
+        return transactionService.addCredit(machineId, amount);
+    }
+
+    @PostMapping("/credit/withdraw")
+    public TransactionResult withdrawCredit(@RequestParam("machine") Long machineId) {
+        return transactionService.withdrawCredits(machineId);
     }
 
 }
