@@ -1,8 +1,9 @@
-package com.vm.xyz.app.service;
+package com.vm.xyz.app.service.impl;
 
 import com.vm.xyz.app.entity.Product;
 import com.vm.xyz.app.exception.NoDataFoundException;
 import com.vm.xyz.app.repository.ProductRepository;
+import com.vm.xyz.app.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
-    }
-
-    @Override
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.vm.xyz.app.configuration;
 
-import com.vm.xyz.app.entity.Product;
-import com.vm.xyz.app.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.vm.xyz.app.entity.*;
+import com.vm.xyz.app.model.CurrencyType;
+import com.vm.xyz.app.model.Owner;
+import com.vm.xyz.app.model.PaymentMethod;
+import com.vm.xyz.app.repository.*;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -10,14 +13,17 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 @Component
+@AllArgsConstructor
 public class DBDataInitializer implements ApplicationRunner {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+    private final MachineRepository machineRepository;
+    private final MachineProductSlotRepository machineProductSlotRepository;
+    private final MachineMoneySlotRepository machineMoneySlotRepository;
+    private final CurrencyRepository currencyRepository;
 
     public void createData() {
 
-        productRepository.deleteAll();
         Product sneakers = this.productRepository.save(
                 new Product("Sneakers", new BigDecimal(1), new BigDecimal("1.75"),
                         "https://www.meijer.com/content/dam/meijer/product/0004/00/0042/43/0004000042431_3_A1C1_1200.png"));
@@ -49,10 +55,61 @@ public class DBDataInitializer implements ApplicationRunner {
         Product brownie = this.productRepository.save(
                 new Product("Brownie", new BigDecimal("1.50"), new BigDecimal("2.75"),
                         "https://cf.shopee.ph/file/35bff282d2697a1593b78f2b756c79eb"));
+
+
+
+        Currency twoUSD = this.currencyRepository.save(new Currency(CurrencyType.BILL, "USD", "Two Dollars", new BigDecimal(2)));
+        Currency oneUSD = this.currencyRepository.save(new Currency(CurrencyType.BILL, "USD", "One Dollar", new BigDecimal(1)));
+        Currency c50 = this.currencyRepository.save(new Currency(CurrencyType.COIN, "USD", "50 Cents", new BigDecimal("0.50")));
+        Currency c25 = this.currencyRepository.save(new Currency(CurrencyType.COIN, "USD", "25 Cents", new BigDecimal("0.25")));
+        Currency c10 = this.currencyRepository.save(new Currency(CurrencyType.COIN, "USD", "10 Cents", new BigDecimal("0.10")));
+        Currency c5 = this.currencyRepository.save(new Currency(CurrencyType.COIN, "USD", "5 Cents", new BigDecimal("0.05")));
+
+
+        Machine xyz1 = this.machineRepository.save(new Machine("XYZ-1",
+                "This is a brand new vendor machine, only accepts $1, $2 bills, 5 cents, 10 cents, 25 cents, 50 cents coins and all kinds of debit/credit cards",
+                PaymentMethod.ALL));
+        Machine xyz2 = this.machineRepository.save(new Machine("XYZ-2",
+                "This is a older machine, only accepts $1, $2 bills and 5 cents, 10 cents, 25 cents, 50 cents coins. Does not accept credit or debit cards.",
+                PaymentMethod.CASH));
+
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, twoUSD, Owner.MACHINE, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, oneUSD, Owner.MACHINE, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c50, Owner.MACHINE, 100));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c25, Owner.MACHINE, 100));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c10, Owner.MACHINE, 100));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c5, Owner.MACHINE, 100));
+
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, twoUSD, Owner.CLIENT, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, oneUSD, Owner.CLIENT, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c50, Owner.CLIENT, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c25, Owner.CLIENT, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c10, Owner.CLIENT, 0));
+        this.machineMoneySlotRepository.save(new MachineMoneySlot(xyz1, c5, Owner.CLIENT, 0));
+
+        saveMoneySlots(xyz1, 100, Owner.MACHINE, twoUSD, oneUSD, c50, c25, c10, c5);
+        saveMoneySlots(xyz1, 0, Owner.CLIENT, twoUSD, oneUSD, c50, c25, c10, c5);
+        saveMoneySlots(xyz2, 100, Owner.MACHINE, twoUSD, oneUSD, c50, c25, c10, c5);
+        saveMoneySlots(xyz2, 0, Owner.CLIENT, twoUSD, oneUSD, c50, c25, c10, c5);
+        saveProductSlots(xyz1, 20, sneakers, water, coke, hersheys, brownie, frappuccino, lays, doritos);
+        saveProductSlots(xyz2, 15, sneakers, water, coke, hersheys, brownie, frappuccino, lays, doritos);
+
+    }
+
+    private void saveMoneySlots(Machine machine, int qty, Owner owner, Currency... currencies) {
+        for (Currency currency: currencies) {
+            machineMoneySlotRepository.save(new MachineMoneySlot(machine, currency, owner, qty));
+        }
+    }
+
+    private void saveProductSlots(Machine machine, int qty, Product... products) {
+        for (Product product: products) {
+            machineProductSlotRepository.save(new MachineProductSlot(machine, product, qty));
+        }
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         createData();
     }
 }
