@@ -4,6 +4,8 @@ import com.vm.xyz.app.entity.Machine;
 import com.vm.xyz.app.entity.MachineMoneySlot;
 import com.vm.xyz.app.entity.MachineProductSlot;
 import com.vm.xyz.app.entity.TransactionHistory;
+import com.vm.xyz.app.enums.CurrencyType;
+import com.vm.xyz.app.enums.PaymentMethod;
 import com.vm.xyz.app.exception.BadRequestException;
 import com.vm.xyz.app.exception.NoDataFoundException;
 import com.vm.xyz.app.model.*;

@@ -1,4 +1,4 @@
-package com.vm.xyz.app.model;
+package com.vm.xyz.app.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

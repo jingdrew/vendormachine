@@ -1,7 +1,7 @@
 package com.vm.xyz.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.vm.xyz.app.model.PaymentMethod;
+import com.vm.xyz.app.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

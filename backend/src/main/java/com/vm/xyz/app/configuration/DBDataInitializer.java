@@ -1,12 +1,13 @@
 package com.vm.xyz.app.configuration;
 
 import com.vm.xyz.app.entity.*;
-import com.vm.xyz.app.model.CurrencyType;
-import com.vm.xyz.app.model.PaymentMethod;
+import com.vm.xyz.app.enums.CurrencyType;
+import com.vm.xyz.app.enums.PaymentMethod;
 import com.vm.xyz.app.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,8 +21,13 @@ public class DBDataInitializer implements ApplicationRunner {
     private final MachineProductSlotRepository machineProductSlotRepository;
     private final MachineMoneySlotRepository machineMoneySlotRepository;
     private final CurrencyRepository currencyRepository;
+    private final XYZUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     public void createData() {
+
+        userRepository.save(new XYZUser("jing", passwordEncoder.encode("1234"), 0));
 
         Product sneakers = this.productRepository.save(
                 new Product("Sneakers", new BigDecimal(1), new BigDecimal("1.75"),

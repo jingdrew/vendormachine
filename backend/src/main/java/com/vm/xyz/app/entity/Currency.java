@@ -1,6 +1,6 @@
 package com.vm.xyz.app.entity;
 
-import com.vm.xyz.app.model.CurrencyType;
+import com.vm.xyz.app.enums.CurrencyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

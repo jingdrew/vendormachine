@@ -4,5 +4,6 @@
       "name": "api.v1",
       "type": "java.lang.String",
       "description": "Description for api.v1."
-  }
-] }
+    }
+  ]
+}

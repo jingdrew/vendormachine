@@ -1,6 +1,7 @@
 package com.vm.xyz.app.api.v1;
 
 import com.vm.xyz.app.entity.*;
+import com.vm.xyz.app.exception.BadRequestException;
 import com.vm.xyz.app.service.MachineService;
 import com.vm.xyz.app.service.ProductService;
 import com.vm.xyz.app.service.TransactionHistoryService;
@@ -22,12 +23,21 @@ public class AdminController {
     private final ProductService productService;
     private final TransactionHistoryService transactionHistoryService;
 
+    @GetMapping(value = "/transaction/test")
+    public String getTransactionHistories() {
+        return "IT WORKS";
+    }
+
     @GetMapping(value = "/transaction/list")
     public List<TransactionHistory> getTransactionHistories(@RequestParam("machine") Long machineId,
-                                                            @RequestParam("date") String dateString) throws ParseException {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = df.parse(dateString);
-        return transactionHistoryService.getTransactionHistories(machineId, date);
+                                                            @RequestParam("date") String dateString) {
+        try {
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = df.parse(dateString);
+            return transactionHistoryService.getTransactionHistories(machineId, date);
+        } catch (ParseException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @GetMapping("/product/list")

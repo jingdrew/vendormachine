@@ -1,5 +1,6 @@
 package com.vm.xyz.app.model;
 
+import com.vm.xyz.app.enums.PaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
