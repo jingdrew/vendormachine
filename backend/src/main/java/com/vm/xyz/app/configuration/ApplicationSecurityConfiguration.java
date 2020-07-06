@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
@@ -25,7 +24,7 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
         http
                 .cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/machine/**")
+                .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/machine/**", "/api/v1/admin/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -42,9 +41,5 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(details);
-    }
-
-    private PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
     }
 }

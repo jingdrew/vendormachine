@@ -1,0 +1,34 @@
+.container {
+  margin-top: 50px !important;
+  display: block;
+}
+
+.image {
+  height: 180px;
+}
+
+.button {
+  margin: 25px;
+  height: 50px;
+  width: 50%;
+  color: white !important;
+  background: green !important;
+
+}
+
+.top {
+  display: flex;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  justify-content: space-between;
+}
+
+.sumary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+h3 {
+  margin-left: 15px;
+}

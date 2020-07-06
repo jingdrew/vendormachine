@@ -16,10 +16,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TransactionHistory extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     private Product product;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     private Machine machine;
 
     @Enumerated(EnumType.STRING)

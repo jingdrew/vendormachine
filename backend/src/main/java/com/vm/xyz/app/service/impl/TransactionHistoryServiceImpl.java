@@ -17,7 +17,7 @@ public class TransactionHistoryServiceImpl implements TransactionHistoryService 
 
     @Override
     public List<TransactionHistory> getTransactionHistories(Long machineId, Date date) {
-        return transactionHistoryRepository.findByMachineIdAndByDate(machineId, date);
+        return transactionHistoryRepository.findTransactionHistories(machineId, date);
     }
 
 }

@@ -22,10 +22,12 @@ public class Machine extends BaseEntity {
     private PaymentMethod acceptedPaymentMethod;
 
     @OneToMany(mappedBy = "machine")
+    @OrderBy("id asc")
     @JsonManagedReference
     private List<MachineProductSlot> productSlotList;
 
     @OneToMany(mappedBy = "machine")
+    @OrderBy("id asc")
     @JsonManagedReference
     private List<MachineMoneySlot> moneySlotList;
 

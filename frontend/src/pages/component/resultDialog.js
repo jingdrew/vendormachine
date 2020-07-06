@@ -27,8 +27,6 @@ const ResultDialog = ({ data, setData }) => {
   const styles = useStyles();
 
   useEffect(() => {
-    console.log(data);
-
     setShow(data.showDialog);
   }, [data.showDialog]);
 

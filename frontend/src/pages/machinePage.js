@@ -80,7 +80,7 @@ const MachinePage = () => {
 
   const handleLogin = () => {
     if (password.length > 0) {
-      history.push('/admin');
+      history.push('/admin', { id: selector.machine.id, key: 'casd' });
     } else {
       setError('Password is epmty.');
     }

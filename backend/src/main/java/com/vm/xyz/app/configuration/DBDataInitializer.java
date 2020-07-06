@@ -77,7 +77,6 @@ public class DBDataInitializer implements ApplicationRunner {
         saveMoneySlots(xyz2, 150,  twoUSD, oneUSD, c50, c25, c10, c5);
         saveProductSlots(xyz1, 20, sneakers, water, coke, hersheys, brownie, frappuccino, lays, doritos);
         saveProductSlots(xyz2, 15, sneakers, water, coke, hersheys, brownie, frappuccino, lays, doritos);
-
     }
 
     private void saveMoneySlots(Machine machine, int qty, Currency... currencies) {
@@ -94,6 +93,6 @@ public class DBDataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        createData();
+        //createData();
     }
 }

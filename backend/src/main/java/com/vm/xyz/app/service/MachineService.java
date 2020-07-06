@@ -20,13 +20,13 @@ public interface MachineService {
 
     List<MachineProductSlot> getMachineProductSlots(Long machineId);
 
-    List<MachineProductSlot> saveMachineProductSlots(List<MachineProductSlot> productSlots);
+    Machine saveMachineProductSlots(Long machineId, List<MachineProductSlot> productSlots);
 
     MachineMoneySlot saveMachineMoneySlot(MachineMoneySlot moneySlot);
 
     List<MachineMoneySlot> getMachineMoneySlots(Long machineId);
 
-    List<MachineMoneySlot> saveMachineMoneySlots(List<MachineMoneySlot> moneySlots);
+    Machine saveMachineMoneySlots(Long machineId, List<MachineMoneySlot> moneySlots);
 
     PaymentResult buyProduct(Long machineId, Long productSlotId, Payment payment);
 

@@ -56,8 +56,13 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public List<MachineProductSlot> saveMachineProductSlots(List<MachineProductSlot> productSlots) {
-        return machineProductSlotRepository.saveAll(productSlots);
+    public Machine saveMachineProductSlots(Long machineId, List<MachineProductSlot> productSlots) {
+        Machine machine = getMachineById(machineId);
+        for (MachineProductSlot slot : productSlots) {
+            slot.setMachine(machine);
+        }
+        machine.setProductSlotList(machineProductSlotRepository.saveAll(productSlots));
+        return machine;
     }
 
     @Override
@@ -71,8 +76,13 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public List<MachineMoneySlot> saveMachineMoneySlots(List<MachineMoneySlot> moneySlots) {
-        return machineMoneySlotRepository.saveAll(moneySlots);
+    public Machine saveMachineMoneySlots(Long machineId, List<MachineMoneySlot> moneySlots) {
+        Machine machine = getMachineById(machineId);
+        for (MachineMoneySlot slot : moneySlots) {
+            slot.setMachine(machine);
+        }
+        machine.setMoneySlotList(machineMoneySlotRepository.saveAll(moneySlots));
+        return machine;
     }
 
     @Override

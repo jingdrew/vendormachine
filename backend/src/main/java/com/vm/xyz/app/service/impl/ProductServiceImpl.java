@@ -5,6 +5,7 @@ import com.vm.xyz.app.exception.NoDataFoundException;
 import com.vm.xyz.app.repository.ProductRepository;
 import com.vm.xyz.app.service.ProductService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAll(Sort.by(Sort.Direction.ASC,"id"));
     }
 
     @Override
