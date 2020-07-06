@@ -33,7 +33,7 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const ReportsTab = ({ data }) => {
+const ReportsTab = ({ data, token }) => {
   const dispatch = useDispatch();
   const reportSelector = useSelector(reportSliceSelector);
   const [transactions, setTransactions] = useState([]);
@@ -43,9 +43,9 @@ const ReportsTab = ({ data }) => {
     if (data.machine) {
       const date = formatDate(new Date());
       setSelectedDate(date);
-      dispatch(fetchTransactions(data.machine.id, date));
+      dispatch(fetchTransactions(data.machine.id, date, token));
     }
-  }, [dispatch, data.machine]);
+  }, [dispatch, data.machine, token]);
 
   useEffect(() => {
     if (reportSelector.status === 'success') {
@@ -63,7 +63,7 @@ const ReportsTab = ({ data }) => {
 
   const handleChangeDate = (e) => {
     if (data.machine) {
-      dispatch(fetchTransactions(data.machine.id, e.target.value));
+      dispatch(fetchTransactions(data.machine.id, e.target.value, token));
     }
   };
 

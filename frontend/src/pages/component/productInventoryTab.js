@@ -10,7 +10,7 @@ import {
 import { saveProductSlots } from '../slices/adminSlice';
 import styles from './admin.module.css';
 
-const ProductInventoryTab = ({ data, setData }) => {
+const ProductInventoryTab = ({ data, setData, token }) => {
   const dispatch = useDispatch();
   const [machine, setMachine] = useState(null);
 
@@ -29,7 +29,7 @@ const ProductInventoryTab = ({ data, setData }) => {
         ...data,
         machine: { ...machine, productSlotList: newSlots },
       });
-      dispatch(saveProductSlots(machine.id, newSlots));
+      dispatch(saveProductSlots(machine.id, newSlots, token));
     }
   };
 

@@ -37,11 +37,12 @@ export const adminSliceSelector = (state) => state.admin;
 
 export default AdminSlice.reducer;
 
-export const fetchMachine = (machineId) => (dispatch) => {
+export const fetchMachine = (machineId, token) => (dispatch) => {
   const url = API + '/machine/' + machineId;
+  const headers = { Authorization: token };
   dispatch(setRequesting());
   axios
-    .get(url)
+    .get(url, { headers: headers })
     .then((res) => {
       dispatch(setRequestSuccess(res.data));
     })
@@ -54,11 +55,12 @@ export const fetchMachine = (machineId) => (dispatch) => {
     });
 };
 
-export const saveProductSlots = (id, data) => (dispatch) => {
+export const saveProductSlots = (id, data, token) => (dispatch) => {
   const url = API + '/machine/pslot?machine=' + id;
+  const headers = { Authorization: token };
   dispatch(setRequesting());
   axios
-    .post(url, data)
+    .post(url, data, { headers: headers })
     .then((res) => {
       dispatch(setRequestSuccess(res.data));
     })
@@ -71,11 +73,14 @@ export const saveProductSlots = (id, data) => (dispatch) => {
     });
 };
 
-export const saveMoneySlots = (data) => (dispatch) => {
-  const url = API + '/machine/mslot';
+export const saveMoneySlots = (id, data, token) => (dispatch) => {
+  const url = API + '/machine/mslot?machine=' + id;
+  const headers = { Authorization: token };
+  console.log(token);
+
   dispatch(setRequesting());
   axios
-    .post(url, data)
+    .post(url, data, { headers: headers })
     .then((res) => {
       dispatch(setRequestSuccess(res.data));
     })

@@ -14,14 +14,16 @@ import {
 } from '../slices/productSlice';
 import styles from './admin.module.css';
 
-const ProductInventoryTab = () => {
+const ProductInventoryTab = ({ token }) => {
   const dispatch = useDispatch();
   const productSelector = useSelector(productSliceSelector);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    if (token) {
+      dispatch(fetchProducts(token));
+    }
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (productSelector.status === 'success') {
@@ -40,7 +42,7 @@ const ProductInventoryTab = () => {
         newProducts[index] = { ...newProducts[index], price: value };
       }
       setProducts(newProducts);
-      dispatch(saveProducts(newProducts));
+      dispatch(saveProducts(newProducts, token));
     }
   };
 

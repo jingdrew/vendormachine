@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  TextField,
-} from '@material-ui/core';
+import { Grid, Card, CardContent, TextField } from '@material-ui/core';
 import { saveMoneySlots } from '../slices/adminSlice';
 import styles from './admin.module.css';
 
-const MoneyInventoryTab = ({ data, setData }) => {
+const MoneyInventoryTab = ({ data, setData, token }) => {
   const dispatch = useDispatch();
   const [machine, setMachine] = useState(null);
 
@@ -29,7 +23,7 @@ const MoneyInventoryTab = ({ data, setData }) => {
         ...data,
         machine: { ...machine, moneySlotList: newSlots },
       });
-      dispatch(saveMoneySlots(machine.id, newSlots));
+      dispatch(saveMoneySlots(machine.id, newSlots, token));
     }
   };
 

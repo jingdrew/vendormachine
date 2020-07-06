@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API = 'http://localhost:8080/api/v1/admin';
+const URL = 'http://localhost:8080/login';
 
-const ReportSlice = createSlice({
-  name: 'reports',
+const LoginSlice = createSlice({
+  name: 'login',
   initialState: {
     status: 'idle',
-    reports: [],
+    token: null,
     error: null,
   },
   reducers: {
@@ -22,7 +22,7 @@ const ReportSlice = createSlice({
     setRequestSuccess: (state, action) => {
       state.error = null;
       state.status = 'success';
-      state.reports = action.payload;
+      state.token = action.payload;
     },
   },
 });
@@ -31,24 +31,26 @@ export const {
   setRequesting,
   setRequestError,
   setRequestSuccess,
-} = ReportSlice.actions;
+} = LoginSlice.actions;
 
-export const reportSliceSelector = (state) => state.reports;
+export const loginSliceSelector = (state) => state.login;
 
-export default ReportSlice.reducer;
+export default LoginSlice.reducer;
 
-export const fetchTransactions = (id, date, token) => (dispatch) => {
-  const url = API + '/transaction/list?machine=' + id + '&date=' + date;
-  const headers = { Authorization: token };
-
+export const login = (username, password) => (dispatch) => {
+  const data = {
+    username: username,
+    password: password,
+  };
   dispatch(setRequesting());
   axios
-    .get(url, { headers: headers })
+    .post(URL, data)
     .then((res) => {
-      dispatch(setRequestSuccess(res.data));
+      const token = res.headers.authorization;
+      dispatch(setRequestSuccess(token));
     })
     .catch((error) => {
-      let msg = 'Server is offline.';
+      let msg = 'Something went wrong.';
       if (error.response) {
         msg = error.response.data.message;
       }

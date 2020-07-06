@@ -22,13 +22,15 @@ const AdminPage = () => {
   const dispatch = useDispatch();
   const [value, setValue] = useState(0);
   const adminSelector = useSelector(adminSliceSelector);
+  const [token, setToken] = useState('');
   const [data, setData] = useState({
     machine: null,
   });
 
   useEffect(() => {
     if (location.state) {
-      dispatch(fetchMachine(location.state.id));
+      setToken(location.state.token);
+      dispatch(fetchMachine(location.state.id, location.state.token));
     } else {
       history.push('/');
     }
@@ -61,16 +63,16 @@ const AdminPage = () => {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        <ProductInventoryTab data={data} setData={setData} />
+        <ProductInventoryTab data={data} setData={setData} token={token} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <MoneyInventoryTab data={data} setData={setData} />
+        <MoneyInventoryTab data={data} setData={setData} token={token} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <ProductTab />
+        <ProductTab token={token} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <ReportsTab data={data} />
+        <ReportsTab data={data} token={token} />
       </TabPanel>
     </Container>
   );

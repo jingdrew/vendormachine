@@ -136,18 +136,12 @@ const ResultDialog = ({ data, setData }) => {
                       <TableCell align='right'>${data.result.change}</TableCell>
                     </TableRow>
                     {data.result.moneyStacksList.map((m, index) => (
-                      <div>
-                        {m.qty > 0 ? (
-                          <TableRow key={index}>
-                            <TableCell component='th'>{m.qty}</TableCell>
-                            <TableCell align='right'>
-                              {m.currency.valueName}
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          <div></div>
-                        )}
-                      </div>
+                      <TableRow key={index}>
+                        <TableCell component='th'>{m.qty}</TableCell>
+                        <TableCell align='right'>
+                          {m.currency.valueName}
+                        </TableCell>
+                      </TableRow>
                     ))}
                   </TableBody>
                 </Table>

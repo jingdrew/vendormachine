@@ -10,6 +10,7 @@ import {
   TextField,
 } from '@material-ui/core';
 import { fetchMachine, machineSelector } from './slices/machineSlice';
+import { login, loginSliceSelector } from './slices/loginSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useHistory } from 'react-router-dom';
 import DisplayPanel from './component/displayPanel';
@@ -38,6 +39,7 @@ const MachinePage = () => {
   const location = useLocation();
   const history = useHistory();
   const dispatch = useDispatch();
+  const loginSelector = useSelector(loginSliceSelector);
   const selector = useSelector(machineSelector);
   const styles = useStyles();
   const [error, setError] = useState('');
@@ -72,6 +74,17 @@ const MachinePage = () => {
     }
   }, [selector]);
 
+  useEffect(() => {
+    if (loginSelector.status === 'success') {
+      history.push('/admin', {
+        id: selector.machine.id,
+        token: loginSelector.token,
+      });
+    } else if (loginSelector.status === 'error') {
+      setError(loginSelector.error);
+    }
+  }, [loginSelector]);
+
   const handleCloseDialog = () => {
     let newData = { ...data };
     newData.showPassDialog = false;
@@ -80,7 +93,8 @@ const MachinePage = () => {
 
   const handleLogin = () => {
     if (password.length > 0) {
-      history.push('/admin', { id: selector.machine.id, key: 'casd' });
+      //history.push('/admin', { id: selector.machine.id, key: 'casd' });
+      dispatch(login(data.machine.model, password));
     } else {
       setError('Password is epmty.');
     }
