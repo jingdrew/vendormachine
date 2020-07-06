@@ -25,7 +25,6 @@ const ControlPanel = ({ data, setData }) => {
 
   useEffect(() => {
     if (transactionSelector.status === 'loading') {
-      setMessage('Welcome :)');
       setHandlingPayment(true);
       if (cardInserted) {
         setMessage('Processing Payment...');
@@ -42,14 +41,22 @@ const ControlPanel = ({ data, setData }) => {
     } else if (transactionSelector.status === 'success') {
       setHandlingPayment(false);
       showTempMessage('Transaction Succesful. Thank You!!!');
-      setData({
-        machine: transactionSelector.result.transactionHistory.machine,
-        selectedSlot: null,
-      });
+      let newData = { ...data };
+      newData.machine = transactionSelector.result.transactionHistory.machine;
+      newData.action = 'BUY';
+      newData.result = transactionSelector.result;
+      newData.selectedSlot = null;
+      newData.showDialog = true;
+      setData(newData);
+      setTotalCredit(0);
+      setCreditStack([]);
     }
   }, [transactionSelector]);
 
   useEffect(() => {
+    if (totalCredit === 0) {
+      setMessage('Welcome :)');
+    }
     if (data.selectedSlot) {
       setMessage('Please Insert Payment');
       let credit = 0;
@@ -82,14 +89,20 @@ const ControlPanel = ({ data, setData }) => {
 
   const handleButtonClick = (val) => {
     if (val === 'admin') {
+      let newData = { ...data };
+      newData.showPassDialog = true;
+      setData(newData);
     } else {
       if (cardInserted) {
         setCardInserted(false);
       } else {
         if (totalCredit > 0) {
-          creditStack.forEach((c) => {
-            console.log(c.qty + ' x ' + c.valueName);
-          });
+          let newData = { ...data };
+          newData.showDialog = true;
+          newData.action = 'WITHDRAW';
+          newData.result = creditStack;
+          setData(newData);
+          setCreditStack([]);
         }
       }
     }
@@ -189,16 +202,18 @@ const ControlPanel = ({ data, setData }) => {
 
             <hr />
             {machine.acceptedPaymentMethod === 'ALL' ? (
-              <Button
-                className={styles.card_button}
-                onClick={() => handleAddPayment('CARD')}
-              >
-                CREDIT/DEBIT CARD
-              </Button>
+              <div>
+                <Button
+                  className={styles.card_button}
+                  onClick={() => handleAddPayment('CARD')}
+                >
+                  CREDIT/DEBIT CARD
+                </Button>
+                <hr />
+              </div>
             ) : (
               <div></div>
             )}
-            <hr />
             <Button
               className={styles.withdraw_button}
               onClick={() => handleButtonClick('withdraw')}

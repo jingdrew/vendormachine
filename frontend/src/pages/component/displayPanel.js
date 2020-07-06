@@ -38,10 +38,9 @@ const DisplayPanel = ({ data, setData }) => {
 
   const handleProductSelect = (slot) => {
     if (selected !== slot) {
-      setData({
-        machine: machine,
-        selectedSlot: slot,
-      });
+      let newData = { ...data };
+      newData.selectedSlot = slot;
+      setData(newData);
     }
   };
 

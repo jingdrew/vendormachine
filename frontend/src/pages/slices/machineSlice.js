@@ -9,6 +9,7 @@ const MachineSlice = createSlice({
     status: 'idle',
     machine: null,
     error: null,
+    login: null,
   },
   reducers: {
     setRequesting: (state) => {
@@ -23,6 +24,10 @@ const MachineSlice = createSlice({
       state.error = null;
       state.status = 'success';
       state.machine = action.payload;
+    },
+    setLoginSuccess: (state, action) => {
+      state.login = action.payload;
+      state.status = 'success';
     },
   },
 });

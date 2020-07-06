@@ -6,9 +6,7 @@ import com.vm.xyz.app.entity.MachineProductSlot;
 import com.vm.xyz.app.entity.TransactionHistory;
 import com.vm.xyz.app.exception.BadRequestException;
 import com.vm.xyz.app.exception.NoDataFoundException;
-import com.vm.xyz.app.model.Payment;
-import com.vm.xyz.app.model.PaymentMethod;
-import com.vm.xyz.app.model.PaymentResult;
+import com.vm.xyz.app.model.*;
 import com.vm.xyz.app.repository.MachineMoneySlotRepository;
 import com.vm.xyz.app.repository.MachineProductSlotRepository;
 import com.vm.xyz.app.repository.MachineRepository;
@@ -17,6 +15,7 @@ import com.vm.xyz.app.service.MachineService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -81,11 +80,116 @@ public class MachineServiceImpl implements MachineService {
         if (payment.getPaymentMethod() == PaymentMethod.CARD) {
             return processPaymentWithCard(machineId, productSlotId);
         } else if (payment.getPaymentMethod() == PaymentMethod.CASH) {
-
+            return processPaymentWithCash(machineId, productSlotId, payment);
         } else {
             throw new BadRequestException("Invalid payment method");
         }
-        return null;
+    }
+
+    private PaymentResult processPaymentWithCash(Long machineId, Long productSlotId, Payment payment) {
+        MachineProductSlot productSlot = machineProductSlotRepository.findById(productSlotId).orElseThrow(
+                () -> new BadRequestException("Selected product is invalid"));
+        Machine machine = machineRepository.findById(machineId).orElseThrow(
+                () -> new BadRequestException("Selected vendor machine is invalid"));
+        if (productSlot.getQty() > 0) {
+            BigDecimal totalCredits = BigDecimal.ZERO;
+            for (MoneyStack stack : payment.getMoneyStacks()) {
+                BigDecimal credit = stack.getCurrency().getValue().multiply(new BigDecimal(stack.getQty()));
+                totalCredits = totalCredits.add(credit);
+            }
+            if (totalCredits.compareTo(productSlot.getProduct().getPrice()) >= 0) {
+                BigDecimal change = totalCredits.subtract(productSlot.getProduct().getPrice());
+                transferCredits(machine.getMoneySlotList(), payment.getMoneyStacks());
+                List<MoneyStack> changeStackList = new ArrayList<>();
+                calculateChanges(change, machine.getMoneySlotList(), changeStackList);
+                productSlot.setQty(productSlot.getQty() - 1);
+                machineProductSlotRepository.save(productSlot);
+                machineMoneySlotRepository.saveAll(machine.getMoneySlotList());
+                TransactionHistory transactionHistory = transactionHistoryRepository.save(
+                        new TransactionHistory(
+                                productSlot.getProduct(),
+                                machine,
+                                PaymentMethod.CASH,
+                                machine.getModel(),
+                                productSlot.getProduct().getName(),
+                                productSlot.getProduct().getCost(),
+                                productSlot.getProduct().getPrice(),
+                                "SUCCESS",
+                                ""));
+
+                return new PaymentResult(changeStackList, transactionHistory, totalCredits, change);
+
+            } else {
+                transactionHistoryRepository.save(
+                        new TransactionHistory(
+                                productSlot.getProduct(),
+                                machine,
+                                PaymentMethod.CASH,
+                                machine.getModel(),
+                                productSlot.getProduct().getName(),
+                                productSlot.getProduct().getCost(),
+                                productSlot.getProduct().getPrice(),
+                                "FAIL",
+                                "Insufficient funds"));
+                throw new BadRequestException("Insufficient funds");
+            }
+        } else {
+            transactionHistoryRepository.save(
+                    new TransactionHistory(
+                            productSlot.getProduct(),
+                            machine,
+                            PaymentMethod.CASH,
+                            machine.getModel(),
+                            productSlot.getProduct().getName(),
+                            productSlot.getProduct().getCost(),
+                            productSlot.getProduct().getPrice(),
+                            "FAIL",
+                            "Product Sold out"));
+            throw new BadRequestException("Product is sold out");
+        }
+    }
+
+    private void transferCredits(List<MachineMoneySlot> moneySlots, List<MoneyStack> moneyStackList) {
+        for (MoneyStack stack : moneyStackList) {
+            for (MachineMoneySlot slot : moneySlots) {
+                if (slot.getCurrency().getValue().compareTo(stack.getCurrency().getValue()) == 0) {
+                    slot.setQty(slot.getQty() + 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void calculateChanges(BigDecimal credits,
+                                  List<MachineMoneySlot> machineMoneySlots,
+                                  List<MoneyStack> changeStackList) {
+        machineMoneySlots.sort((o1, o2) -> o2.getCurrency().getValue().compareTo(o1.getCurrency().getValue()));
+        for (MachineMoneySlot slot : machineMoneySlots) {
+            if (credits.compareTo(BigDecimal.ZERO) == 0)
+                break;
+            if (slot.getCurrency().getCurrencyType() == CurrencyType.COIN) {
+                int qty = slot.getQty();
+                if (qty > 0) {
+                    BigDecimal coinValue = slot.getCurrency().getValue();
+                    BigDecimal remainder = credits.remainder(coinValue);
+                    BigDecimal tempCredit = credits.subtract(remainder);
+                    BigDecimal coinValueTotal = coinValue.multiply(new BigDecimal(qty));
+                    int qtyRequired = tempCredit.divide(coinValue).intValueExact();
+                    if (qty >= qtyRequired) {
+                        slot.setQty(slot.getQty() - qtyRequired);
+                        credits = remainder;
+                        changeStackList.add(new MoneyStack(slot.getCurrency(), qtyRequired));
+                    } else {
+                        tempCredit = tempCredit.subtract(coinValueTotal);
+                        credits = tempCredit.add(remainder);
+                        changeStackList.add(new MoneyStack(slot.getCurrency(), qty));
+                    }
+                }
+            }
+        }
+        if (credits.compareTo(BigDecimal.ZERO) > 0) {
+            throw new BadRequestException("The machine is out of change");
+        }
     }
 
     private PaymentResult processPaymentWithCard(Long machineId, Long productSlotId) {
@@ -110,7 +214,7 @@ public class MachineServiceImpl implements MachineService {
                                 "SUCCESS",
                                 ""));
 
-                return new PaymentResult(new ArrayList<>(), transactionHistory);
+                return new PaymentResult(new ArrayList<>(), transactionHistory, BigDecimal.ZERO, BigDecimal.ZERO);
             } else {
                 TransactionHistory transactionHistory = transactionHistoryRepository.save(
                         new TransactionHistory(
@@ -124,7 +228,7 @@ public class MachineServiceImpl implements MachineService {
                                 "FAIL",
                                 "Insufficient Funds"));
 
-                return new PaymentResult(new ArrayList<>(), transactionHistory);
+                return new PaymentResult(new ArrayList<>(), transactionHistory, BigDecimal.ZERO, BigDecimal.ZERO);
             }
         } else {
             throw new BadRequestException("Product is sold out.");
