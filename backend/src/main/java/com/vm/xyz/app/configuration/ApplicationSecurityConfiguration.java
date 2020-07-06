@@ -1,8 +1,8 @@
 package com.vm.xyz.app.configuration;
 
 import com.vm.xyz.app.model.ApplicationUserRole;
-import com.vm.xyz.app.security.JwtTokenVerifier;
-import com.vm.xyz.app.security.JwtUsernameAndPasswordAuthFilter;
+import com.vm.xyz.app.security.filter.JwtTokenVerifier;
+import com.vm.xyz.app.security.filter.JwtUsernameAndPasswordAuthFilter;
 import com.vm.xyz.app.service.impl.XYZUserServiceDetailsImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,8 +27,12 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager(), jwtConfiguration))
                 .addFilterAfter(new JwtTokenVerifier(jwtConfiguration), JwtUsernameAndPasswordAuthFilter.class)

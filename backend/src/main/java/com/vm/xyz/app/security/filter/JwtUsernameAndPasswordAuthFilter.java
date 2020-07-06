@@ -1,8 +1,9 @@
-package com.vm.xyz.app.security;
+package com.vm.xyz.app.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vm.xyz.app.configuration.JwtConfiguration;
 import com.vm.xyz.app.exception.AttemptAuthFailException;
+import com.vm.xyz.app.model.UsernameAndPasswordAuthRequest;
 import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

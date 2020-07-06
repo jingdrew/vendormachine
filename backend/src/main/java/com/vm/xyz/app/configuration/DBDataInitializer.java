@@ -27,7 +27,8 @@ public class DBDataInitializer implements ApplicationRunner {
 
     public void createData() {
 
-        userRepository.save(new XYZUser("jing", passwordEncoder.encode("1234"), 0));
+        XYZUser user1 = userRepository.save(new XYZUser("XYZ-1", passwordEncoder.encode("1234"), 0));
+        XYZUser user2 = userRepository.save(new XYZUser("XYZ-2", passwordEncoder.encode("1234"), 0));
 
         Product sneakers = this.productRepository.save(
                 new Product("Sneakers", new BigDecimal(1), new BigDecimal("1.75"),
@@ -71,10 +72,10 @@ public class DBDataInitializer implements ApplicationRunner {
         Currency c5 = this.currencyRepository.save(new Currency(CurrencyType.COIN, "USD", "5 Cents", new BigDecimal("0.05")));
 
 
-        Machine xyz1 = this.machineRepository.save(new Machine("XYZ-1",
+        Machine xyz1 = this.machineRepository.save(new Machine(user1.getUsername(),
                 "This is a brand new vendor machine, only accepts $1, $2 bills, 5 cents, 10 cents, 25 cents, 50 cents coins and all kinds of debit/credit cards",
                 PaymentMethod.ALL));
-        Machine xyz2 = this.machineRepository.save(new Machine("XYZ-2",
+        Machine xyz2 = this.machineRepository.save(new Machine(user2.getUsername(),
                 "This is a older machine, only accepts $1, $2 bills and 5 cents, 10 cents, 25 cents, 50 cents coins. Does not accept credit or debit cards.",
                 PaymentMethod.CASH));
 
@@ -99,6 +100,6 @@ public class DBDataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        //createData();
+        createData();
     }
 }

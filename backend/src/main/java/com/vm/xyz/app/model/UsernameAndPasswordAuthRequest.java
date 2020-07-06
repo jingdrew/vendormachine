@@ -1,4 +1,4 @@
-package com.vm.xyz.app.security;
+package com.vm.xyz.app.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

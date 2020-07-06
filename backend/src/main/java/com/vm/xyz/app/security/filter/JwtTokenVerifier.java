@@ -1,4 +1,4 @@
-package com.vm.xyz.app.security;
+package com.vm.xyz.app.security.filter;
 
 import com.google.common.base.Strings;
 import com.vm.xyz.app.configuration.JwtConfiguration;
