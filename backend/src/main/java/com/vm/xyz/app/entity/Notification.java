@@ -7,17 +7,13 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 
-@Entity
-@Getter
 @Setter
+@Getter
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class XYZUser extends BaseEntity {
+public class Notification extends BaseEntity {
 
-    private String username;
-    private String password;
     private String email;
-    private int loginAttempts;
-
-
+    private String message;
 }

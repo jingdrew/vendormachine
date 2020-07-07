@@ -27,8 +27,8 @@ public class DBDataInitializer implements ApplicationRunner {
 
     public void createData() {
 
-        XYZUser user1 = userRepository.save(new XYZUser("XYZ-1", passwordEncoder.encode("1234"), 0));
-        XYZUser user2 = userRepository.save(new XYZUser("XYZ-2", passwordEncoder.encode("1234"), 0));
+        XYZUser user1 = userRepository.save(new XYZUser("XYZ-1", passwordEncoder.encode("1234"), "adminxyz1@gmail.com", 0));
+        XYZUser user2 = userRepository.save(new XYZUser("XYZ-2", passwordEncoder.encode("1234"), "adminxyz2@gmail.com", 0));
 
         Product sneakers = this.productRepository.save(
                 new Product("Sneakers", new BigDecimal(1), new BigDecimal("1.75"),
