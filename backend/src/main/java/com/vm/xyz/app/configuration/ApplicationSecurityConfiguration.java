@@ -1,28 +1,30 @@
 package com.vm.xyz.app.configuration;
 
 import com.vm.xyz.app.model.ApplicationUserRole;
+import com.vm.xyz.app.security.RestAuthenticationEntryPoint;
 import com.vm.xyz.app.security.filter.JwtTokenVerifier;
-import com.vm.xyz.app.security.filter.JwtUsernameAndPasswordAuthFilter;
-import com.vm.xyz.app.service.impl.XYZUserServiceDetailsImpl;
+import com.vm.xyz.app.service.impl.XYZUserServiceImpl;
+import com.vm.xyz.app.util.ResponseMaker;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
 public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final PasswordEncoder passwordEncoder;
-    private final XYZUserServiceDetailsImpl xyzUserService;
+    private final XYZUserServiceImpl xyzUserService;
     private final JwtConfiguration jwtConfiguration;
+    private final ResponseMaker responseMaker;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -34,26 +36,26 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthFilter(authenticationManager(), jwtConfiguration))
-                .addFilterAfter(new JwtTokenVerifier(jwtConfiguration), JwtUsernameAndPasswordAuthFilter.class)
+                .addFilterAfter(new JwtTokenVerifier(jwtConfiguration, responseMaker), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/machine/**")
+                .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/machine/**", "/api/v1/auth/**")
                 .permitAll()
                 .antMatchers("/api/v1/admin/**").hasRole(ApplicationUserRole.ADMIN.name())
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint);
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(daoAuthenticationProvider());
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(xyzUserService);
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder);
-        provider.setUserDetailsService(xyzUserService);
-        return provider;
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
     }
+
 }

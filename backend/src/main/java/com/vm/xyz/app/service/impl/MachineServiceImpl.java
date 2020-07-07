@@ -190,7 +190,8 @@ public class MachineServiceImpl implements MachineService {
                     if (qty >= qtyRequired) {
                         slot.setQty(slot.getQty() - qtyRequired);
                         credits = remainder;
-                        changeStackList.add(new MoneyStack(slot.getCurrency(), qtyRequired));
+                        if (qtyRequired > 0)
+                            changeStackList.add(new MoneyStack(slot.getCurrency(), qtyRequired));
                     } else {
                         tempCredit = tempCredit.subtract(coinValueTotal);
                         credits = tempCredit.add(remainder);
