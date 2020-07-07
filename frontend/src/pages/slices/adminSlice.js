@@ -40,6 +40,8 @@ export default AdminSlice.reducer;
 export const fetchMachine = (machineId, token) => (dispatch) => {
   const url = API + '/machine/' + machineId;
   const headers = { Authorization: token };
+  console.log(headers);
+
   dispatch(setRequesting());
   axios
     .get(url, { headers: headers })

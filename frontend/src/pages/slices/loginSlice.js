@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const URL = 'http://localhost:8080/login';
+const URL = 'http://localhost:8080/api/v1/auth/authenticate';
 
 const LoginSlice = createSlice({
   name: 'login',
@@ -22,7 +22,7 @@ const LoginSlice = createSlice({
     setRequestSuccess: (state, action) => {
       state.error = null;
       state.status = 'success';
-      state.token = action.payload;
+      state.token = 'Bearer ' + action.payload;
     },
   },
 });
@@ -46,8 +46,7 @@ export const login = (username, password) => (dispatch) => {
   axios
     .post(URL, data)
     .then((res) => {
-      const token = res.headers.authorization;
-      dispatch(setRequestSuccess(token));
+      dispatch(setRequestSuccess(res.data.token));
     })
     .catch((error) => {
       let msg = 'Something went wrong.';
